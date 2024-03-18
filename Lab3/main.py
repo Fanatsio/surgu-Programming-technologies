@@ -16,7 +16,7 @@ def main():
         elif choice == 1:
             perform_sort(array, sort.select_sort, "сортировки выбором")
         elif choice == 2:
-            perform_sort(array, sort.radix_sort, "поразрядной сортировки")
+            perform_sort(array, sort.radix_sort_msd, "поразрядной сортировки")
 
 
 def perform_sort(array, sorting_function, sort_name):

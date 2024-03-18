@@ -22,29 +22,33 @@ def select_sort(array):
     return array
 
 
-def counting_sort(array, exp):
-    n = len(array)
+def counting_sorting_msd(sort_array, exp):
+    n = len(sort_array)
     output = [0] * n
     count = [0] * 10
 
-    for num in array:
-        digit = (num // exp) % 10
-        count[digit] += 1
+    for i in range(n):
+        index = (sort_array[i] // exp) % 10
+        count[index] += 1
 
     for i in range(1, 10):
         count[i] += count[i - 1]
 
-    for num in reversed(array):
-        digit = (num // exp) % 10
-        output[count[digit] - 1] = num
-        count[digit] -= 1
+    i = n - 1
+    while i >= 0:
+        index = (sort_array[i] // exp) % 10
+        output[count[index] - 1] = sort_array[i]
+        count[index] -= 1
+        i -= 1
 
-    array[:] = output
+    for i in range(n):
+        sort_array[i] = output[i]
 
 
-def radix_sort(array):
-    max_value = max(array)
+def radix_sort_msd(sort_array):
+    max_value = max(sort_array)
     exp = 1
     while max_value // exp > 0:
-        counting_sort(array, exp)
+        counting_sorting_msd(sort_array, exp)
         exp *= 10
+    return sort_array
