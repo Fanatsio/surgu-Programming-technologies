@@ -1,9 +1,8 @@
 import turtle
 
 
-WIDTH, HEIGHT = 1000, 800
 screen = turtle.Screen()
-screen.setup(WIDTH, HEIGHT)
+screen.setup(1000, 800)
 screen.bgcolor('black')
 screen.delay(0)
 
@@ -15,8 +14,6 @@ gens = 13
 axiom = 'FX'
 chr_1, rule_1 = 'X', 'X+YF+'
 chr_2, rule_2 = 'Y', '-FX-Y'
-step = 4
-angle = 90
 
 
 def apply_rules(axiom):
@@ -24,23 +21,19 @@ def apply_rules(axiom):
                     rule_2 if chr == chr_2 else chr for chr in axiom])
 
 
-def get_result(gens, axiom):
-    for _ in range(gens):
-        axiom = apply_rules(axiom)
-    return axiom
-
-
 def draw_l_system(axiom):
     for chr in axiom:
         if chr == chr_1 or chr == chr_2:
-            tutle.forward(step)
+            tutle.forward(4)
         elif chr == '+':
-            tutle.right(angle)
+            tutle.right(90)
         elif chr == '-':
-            tutle.left(angle)
+            tutle.left(90)
 
 
-axiom = get_result(gens, axiom)
+for _ in range(gens):
+    axiom = apply_rules(axiom)
+
 draw_l_system(axiom)
 
 screen.exitonclick()

@@ -22,7 +22,6 @@ def reverse_dragon_curve(turtle, gens, length):
 WIDTH, HEIGHT = 1000, 800
 screen = turtle.Screen()
 screen.setup(WIDTH, HEIGHT)
-screen.title("Dragon Curve Fractal")
 screen.bgcolor("white")
 screen.delay(0)
 
