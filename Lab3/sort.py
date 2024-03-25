@@ -5,6 +5,10 @@ def menu():
     return int(input("Введите >> "))
 
 
+def is_sorted(arr):
+    return all(arr[i] <= arr[i + 1] for i in range(len(arr) - 1))
+
+
 def selection_sort(arr):
     for i in range(len(arr)):
         min_index = i
@@ -18,32 +22,5 @@ def selection_sort(arr):
     return arr
 
 
-def counting_sort(arr, exp, counts):
-    n = len(arr)
-    output = [0] * n
-
-    for i in range(n):
-        index = ord(arr[i][exp]) if len(arr[i]) > exp else 0
-        counts.setdefault(index, 0)
-        counts[index] += 1
-
-    sorted_indices = sorted(counts.keys())
-    total = 0
-    for index in sorted_indices:
-        counts[index], total = total, counts[index] + total
-
-    for i in range(n - 1, -1, -1):
-        index = ord(arr[i][exp]) if len(arr[i]) > exp else 0
-        output[counts[index]] = arr[i]
-        counts[index] += 1
-
-    for i in range(n):
-        arr[i] = output[i]
-
-
 def radix_sort(arr):
-    max_length = max(len(x) for x in arr)
-    for exp in range(max_length - 1, -1, -1):
-        counts = {}
-        counting_sort(arr, exp, counts)
-    return arr
+    pass
