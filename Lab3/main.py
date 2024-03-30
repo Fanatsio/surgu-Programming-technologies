@@ -4,9 +4,7 @@ import sort
 
 def main():
     with open('sort_benchmark.txt', 'r') as file:
-        array = []
-        for line in file:
-            array.append(line.strip())
+        array = [line.strip() for line in file]
 
     print(f"Массив до сортировки: {array} \n"
           f"Длина массива: {len(array)}")

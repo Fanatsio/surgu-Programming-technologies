@@ -13,7 +13,7 @@ def selection_sort(arr):
     for i in range(len(arr)):
         min_index = i
         for j in range(i + 1, len(arr)):
-            if type(arr[j]) == type(arr[min_index]):
+            if isinstance(arr[j], type(arr[min_index])):
                 if arr[j] < arr[min_index]:
                     min_index = j
             elif isinstance(arr[j], int) and isinstance(arr[min_index], str):
@@ -22,5 +22,31 @@ def selection_sort(arr):
     return arr
 
 
+def counting_sort(arr, exp):
+    n = len(arr)
+    output = [0] * n
+    count = [0] * 65536  # Увеличиваем размер массива для подсчета частоты символов Unicode
+
+    for i in range(n):
+        index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
+        count[index] += 1
+
+    for i in range(1, 65536):  # Также изменяем границу цикла
+        count[i] += count[i - 1]
+
+    i = n - 1
+    while i >= 0:
+        index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
+        output[count[index] - 1] = arr[i]
+        count[index] -= 1
+        i -= 1
+
+    for i in range(n):
+        arr[i] = output[i]
+
+
 def radix_sort(arr):
-    pass
+    max_len = max(len(s) for s in arr)
+    for exp in range(max_len - 1, -1, -1):
+        counting_sort(arr, exp)
+    return arr
