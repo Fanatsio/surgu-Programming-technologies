@@ -25,13 +25,13 @@ def selection_sort(arr):
 def counting_sort(arr, exp):
     n = len(arr)
     output = [0] * n
-    count = [0] * 65536  # Увеличиваем размер массива для подсчета частоты символов Unicode
+    count = [0] * 65536
 
     for i in range(n):
         index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
         count[index] += 1
 
-    for i in range(1, 65536):  # Также изменяем границу цикла
+    for i in range(1, 65536):
         count[i] += count[i - 1]
 
     i = n - 1
