@@ -4,21 +4,18 @@ def menu():
           "0 - Выход")
     return int(input("Введите >> "))
 
-
 def is_sorted(array):
     return all(array[i] <= array[i + 1] for i in range(len(array) - 1))
 
-
 def insertion_sort(array):
-    for i in range(len(array)):
+    for i in range(1, len(array)):
         key = array[i]
         j = i - 1
-        while j >= 0 and str(array[j]) > str(key):
+        while j >= 0 and array[j] > key:
             array[j + 1] = array[j]
             j -= 1
         array[j + 1] = key
     return array
-
 
 class Node:
     def __init__(self, value):
@@ -57,5 +54,4 @@ def tree_sort(arr):
             root = node
         else:
             insert(root, node)
-    sorted_arr = inorder_traversal(root)
-    return sorted_arr
+    return inorder_traversal(root)
