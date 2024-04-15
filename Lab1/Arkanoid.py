@@ -1,7 +1,6 @@
 import pygame
 from random import randrange as rnd
 
-# Глобальные константы
 WIDTH, HEIGHT = 1200, 800
 FPS = 90
 
@@ -16,12 +15,10 @@ BALL_RECT = int(BALL_RADIUS * 2 ** 0.5)
 BLOCK_WIDTH = 100
 BLOCK_HEIGHT = 50
 
-# Инициализация Pygame
 pygame.init()
 screen = pygame.display.set_mode((WIDTH, HEIGHT))
 clock = pygame.time.Clock()
 
-# Определение классов
 class Paddle:
     def __init__(self, x, y, width, height, speed):
         self.rect = pygame.Rect(x, y, width, height)
@@ -49,7 +46,6 @@ class Block:
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
 
-# Функции
 def detect_collision(ball, rect):
     if ball.dx > 0:
         delta_x = ball.rect.right - rect.left
@@ -74,7 +70,6 @@ def draw_objects(paddle, ball, blocks):
     pygame.draw.rect(screen, pygame.Color('darkorange'), paddle.rect)
     pygame.draw.circle(screen, pygame.Color('white'), ball.rect.center, BALL_RADIUS)
 
-# Основной цикл игры
 def main():
     paddle = Paddle(WIDTH // 2 - PADDLE_WIDTH // 2, HEIGHT - PADDLE_HEIGHT - 10, PADDLE_WIDTH, PADDLE_HEIGHT, PADDLE_SPEED)
     ball = Ball(rnd(BALL_RECT, WIDTH - BALL_RECT), HEIGHT // 2, BALL_RADIUS, BALL_SPEED)
