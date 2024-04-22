@@ -1,5 +1,4 @@
 import time
-import random
 
 class Sorting:
     @staticmethod
@@ -9,38 +8,35 @@ class Sorting:
     def sort(self, arr):
         raise NotImplementedError("Subclasses must implement sort method.")
 
-
 class SelectionSort(Sorting):
-    @staticmethod
-    def sort(arr):
-        steps = []
+    def sort(self, arr):
         for i in range(len(arr)):
             min_index = i
             for j in range(i + 1, len(arr)):
-                if arr[j] < arr[min_index]:
+                if isinstance(arr[j], type(arr[min_index])):
+                    if arr[j] < arr[min_index]:
+                        min_index = j
+                elif isinstance(arr[j], int) and isinstance(arr[min_index], str):
                     min_index = j
             arr[i], arr[min_index] = arr[min_index], arr[i]
-            steps.append(arr.copy())
-        return arr, steps
-
+        return arr
 
 class RadixSort(Sorting):
-    @staticmethod
-    def counting_sort(arr, exp):
+    def _counting_sort(self, arr, exp):
         n = len(arr)
         output = [0] * n
-        count = [0] * 10
+        count = [0] * 65536
 
         for i in range(n):
-            index = (arr[i] // exp) % 10
+            index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
             count[index] += 1
 
-        for i in range(1, 10):
+        for i in range(1, 65536):
             count[i] += count[i - 1]
 
         i = n - 1
         while i >= 0:
-            index = (arr[i] // exp) % 10
+            index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
             output[count[index] - 1] = arr[i]
             count[index] -= 1
             i -= 1
@@ -48,43 +44,15 @@ class RadixSort(Sorting):
         for i in range(n):
             arr[i] = output[i]
 
-    @staticmethod
-    def sort(arr):
-        steps = []
-        max_num = max(arr)
-        exp = 1
-        while max_num // exp > 0:
-            RadixSort.counting_sort(arr, exp)
-            steps.append(arr.copy())
-            exp *= 10
-        return arr, steps
-
-
-def perform_sort(array, sort_func, sort_name):
-    start_time = time.perf_counter()
-    sorted_array, steps = sort_func(array)
-    end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
-
-    print("------------------------------------\n")
-    for step in steps:
-        print(step)
-    print("------------------------------------\n"
-          f"Массив после {sort_name}: {sorted_array}\n"
-          f"Длина массива {sort_name}: {len(sorted_array)}\n"
-          f"Время выполнения {sort_name}: {elapsed_time}\n"
-          f"Является массив отсортированным: {Sorting.is_sorted(sorted_array)}\n")
-
-
-def menu():
-    print("1 - Сортировка выбором\n"
-          "2 - Поразрядная сортировка\n"
-          "0 - Выход")
-    return int(input("Введите >> "))
-
+    def sort(self, arr):
+        max_len = max(len(s) for s in arr)
+        for exp in range(max_len - 1, -1, -1):
+            self._counting_sort(arr, exp)
+        return arr
 
 def main():
-    array = [random.randint(1, 100) for _ in range(10)]
+    with open('sort_benchmark.txt', 'r') as file:
+        array = [line.strip() for line in file]
 
     print(f"Массив до сортировки: {array} \n"
           f"Длина массива: {len(array)}")
@@ -95,10 +63,27 @@ def main():
         if choice == 0:
             exit()
         elif choice == 1:
-            perform_sort(array.copy(), SelectionSort.sort, "сортировки выбором")
+            perform_sort(array.copy(), SelectionSort(), "сортировки выбором")
         elif choice == 2:
-            perform_sort(array.copy(), RadixSort.sort, "поразрядной сортировки")
+            perform_sort(array.copy(), RadixSort(), "поразрядной сортировки")
 
+def perform_sort(array, sorter, sort_name):
+    start_time = time.perf_counter()
+    sorted_array = sorter.sort(array)
+    end_time = time.perf_counter()
+    elapsed_time = end_time - start_time
+
+    print("------------------------------------\n"
+          f"Массив после {sort_name}: {sorted_array}\n"
+          f"Длина массива {sort_name}: {len(sorted_array)}\n"
+          f"Время выполнения {sort_name}: {elapsed_time}\n"
+          f"Является массив отсортированным: {Sorting.is_sorted(sorted_array)}\n")
+
+def menu():
+    print("1 - Сортировка выбором\n"
+          "2 - Поразрядная сортировка\n"
+          "0 - Выход")
+    return int(input("Введите >> "))
 
 if __name__ == "__main__":
     main()
