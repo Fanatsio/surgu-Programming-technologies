@@ -15,13 +15,6 @@ class RadixSort:
             self._steps.append(data.copy())
         return data
 
-class RadixSortWithSteps(RadixSort):
-    def __init__(self):
-        super().__init__()
-
-    def get_steps(self):
-        return self._steps
-
 class SelectionSort:
     def __init__(self):
         self._steps = []
@@ -42,6 +35,14 @@ class SelectionSortWithSteps(SelectionSort):
 
     def get_steps(self):
         return self._steps
+    
+
+class RadixSortWithSteps(RadixSort):
+    def __init__(self):
+        super().__init__()
+
+    def get_steps(self):
+        return self._steps
 
 class SortVisualizer:
     def __init__(self, sort_with_steps):
@@ -51,18 +52,6 @@ class SortVisualizer:
         steps = self.sort_with_steps.get_steps()
         for i, step in enumerate(steps, start=1):
             print(f"Step {i}: \n{','.join(map(str, step))}")
-            
-
-# slectionSort = SelectionSortWithSteps()
-# radix_sort = RadixSortWithSteps()
-
-# selected_sorted_data = slectionSort.sort(data.copy)
-# radix_sorted_data = radix_sort.sort(data.copy)
-
-# visualizer = SortVisualizer(slectionSort)
-# visualizer.visualize_sorting()
-
-# print(f"sort by me: \n{sorted_data}")
 
 def menu():
     print("1 - Сортировка выбором\n"
@@ -70,24 +59,27 @@ def menu():
           "0 - Выход")
     return int(input("Введите >> "))
 
+data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony", 
+    "friends", "butterfly", "purple", "angel", "jordan", "liverpool", "justin"]
 
-def main():
-    data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony", 
-        "friends", "butterfly", "purple", "angel", "jordan", "liverpool", "justin"]
+print(f"Массив до сортировки: {data}")
 
-    print(f"Массив до сортировки: {data} \n"
-          f"Длина массива: {len(data)}")
+while True:
+    choice = menu()
 
-    while True:
-        choice = menu()
+    if choice == 0:
+        exit()
+    elif choice == 1:
+        slectionSort = SelectionSortWithSteps()
+        selected_sorted_data = slectionSort.sort(data.copy())
+        visualizer = SortVisualizer(slectionSort)
+        visualizer.visualize_sorting()
 
-        if choice == 0:
-            exit()
-        elif choice == 1:
-            perform_sort(array.copy(), SelectionSort.sort, "сортировки выбором")
-        elif choice == 2:
-            perform_sort(array.copy(), RadixSort.sort, "поразрядной сортировки")
+        print(f"Selection sort: \n{selected_sorted_data}")
+    elif choice == 2:
+        radix_sort = RadixSortWithSteps()
+        radix_sorted_data = radix_sort.sort(data.copy())
+        visualizer = SortVisualizer(radix_sort)
+        visualizer.visualize_sorting()
 
-
-if __name__ == "__main__":
-    main()
+        print(f"Radix sort: \n{radix_sorted_data}")

@@ -1,83 +1,57 @@
-import time
+class RadixSort:
+    def __init__(self):
+        self._steps = []
 
-class Sorting:
-    @staticmethod
-    def is_sorted(arr):
-        return all(arr[i] <= arr[i + 1] for i in range(len(arr) - 1))
+    def sort(self, data):
+        max_length = max(len(str(item)) for item in data)
+        for i in range(max_length - 1, -1, -1):
+            buckets = [[] for _ in range(256)]
+            for item in data:
+                key = ord(item[i]) if i < len(item) else 0
+                buckets[key].append(item)
+            data = []
+            for bucket in buckets:
+                data.extend(bucket)
+            self._steps.append(data.copy())
+        return data
 
-    def sort(self, arr):
-        raise NotImplementedError("Subclasses must implement sort method.")
+class SelectionSort:
+    def __init__(self):
+        self._steps = []
 
-class SelectionSort(Sorting):
-    def sort(self, arr):
-        for i in range(len(arr)):
+    def sort(self, data):
+        for i in range(len(data)):
             min_index = i
-            for j in range(i + 1, len(arr)):
-                if isinstance(arr[j], type(arr[min_index])):
-                    if arr[j] < arr[min_index]:
-                        min_index = j
-                elif isinstance(arr[j], int) and isinstance(arr[min_index], str):
+            for j in range(i + 1, len(data)):
+                if data[j] < data[min_index]:
                     min_index = j
-            arr[i], arr[min_index] = arr[min_index], arr[i]
-        return arr
+            data[i], data[min_index] = data[min_index], data[i]
+            self._steps.append(data.copy())
+        return data
 
-class RadixSort(Sorting):
-    def _counting_sort(self, arr, exp):
-        n = len(arr)
-        output = [0] * n
-        count = [0] * 65536
+class SelectionSortWithSteps(SelectionSort):
+    def __init__(self):
+        super().__init__()
 
-        for i in range(n):
-            index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
-            count[index] += 1
+    def get_steps(self):
+        return self._steps
+    
 
-        for i in range(1, 65536):
-            count[i] += count[i - 1]
+class RadixSortWithSteps(RadixSort):
+    def __init__(self):
+        super().__init__()
 
-        i = n - 1
-        while i >= 0:
-            index = ord(arr[i][exp]) if exp < len(arr[i]) else 0
-            output[count[index] - 1] = arr[i]
-            count[index] -= 1
-            i -= 1
+    def get_steps(self):
+        return self._steps
 
-        for i in range(n):
-            arr[i] = output[i]
+class SortVisualizer:
+    def __init__(self, sort_with_steps):
+        self.sort_with_steps = sort_with_steps
 
-    def sort(self, arr):
-        max_len = max(len(s) for s in arr)
-        for exp in range(max_len - 1, -1, -1):
-            self._counting_sort(arr, exp)
-        return arr
-
-def main():
-    with open('sort_benchmark.txt', 'r') as file:
-        array = [line.strip() for line in file]
-
-    print(f"Массив до сортировки: {array} \n"
-          f"Длина массива: {len(array)}")
-
-    while True:
-        choice = menu()
-
-        if choice == 0:
-            exit()
-        elif choice == 1:
-            perform_sort(array.copy(), SelectionSort(), "сортировки выбором")
-        elif choice == 2:
-            perform_sort(array.copy(), RadixSort(), "поразрядной сортировки")
-
-def perform_sort(array, sorter, sort_name):
-    start_time = time.perf_counter()
-    sorted_array = sorter.sort(array)
-    end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
-
-    print("------------------------------------\n"
-          f"Массив после {sort_name}: {sorted_array}\n"
-          f"Длина массива {sort_name}: {len(sorted_array)}\n"
-          f"Время выполнения {sort_name}: {elapsed_time}\n"
-          f"Является массив отсортированным: {Sorting.is_sorted(sorted_array)}\n")
+    def visualize_sorting(self):
+        steps = self.sort_with_steps.get_steps()
+        for i, step in enumerate(steps, start=1):
+            print(f"Step {i}: \n{','.join(map(str, step))}")
 
 def menu():
     print("1 - Сортировка выбором\n"
@@ -85,5 +59,28 @@ def menu():
           "0 - Выход")
     return int(input("Введите >> "))
 
-if __name__ == "__main__":
-    main()
+with open('sort_benchmark.txt', 'r') as file:
+    data = [line.strip() for line in file]
+
+print(f"Массив до сортировки: {data} \n"
+        f"Длина массива: {len(data)}")
+
+while True:
+    choice = menu()
+
+    if choice == 0:
+        exit()
+    elif choice == 1:
+        slectionSort = SortWithSteps()
+        selected_sorted_data = slectionSort.sort(data.copy())
+        # visualizer = SortVisualizer(slectionSort)
+        # visualizer.visualize_sorting()
+
+        print(f"sort by me: \n{selected_sorted_data}")
+    elif choice == 2:
+        radix_sort = SortWithSteps()
+        radix_sorted_data = radix_sort.sort(data.copy())
+        # visualizer = SortVisualizer(radix_sort)
+        # visualizer.visualize_sorting()
+
+        print(f"sort by me: \n{radix_sorted_data}")
