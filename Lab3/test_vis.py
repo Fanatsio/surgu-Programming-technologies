@@ -20,7 +20,6 @@ class SelectionSortVisualizer:
             self.data[i], self.data[min_index] = self.data[min_index], self.data[i]
             yield self.data
 
-
     def animate(self, frame):
         print(f"Current iteration: {self.iteration}, Length of data: {len(self.data)}")
         if self.iteration < len(self.data):
@@ -35,19 +34,12 @@ class SelectionSortVisualizer:
             self.bar_rects[-1].set_color('lightcoral')  # Highlight the last element
         return self.bar_rects
 
-
-
-
     def visualize(self):
         anim = animation.FuncAnimation(self.fig, self.animate, frames=self.selection_sort, repeat=False, blit=True)
         plt.show()
 
-def main():
-    np.random.seed(0)
-    data = np.random.randint(1, 100, size=100)
+np.random.seed(0)
+data = np.random.randint(1, 100, size=100)
 
-    sorter_visualizer = SelectionSortVisualizer(data.copy())
-    sorter_visualizer.visualize()
-
-if __name__ == "__main__":
-    main()
+sorter_visualizer = SelectionSortVisualizer(data.copy())
+sorter_visualizer.visualize()

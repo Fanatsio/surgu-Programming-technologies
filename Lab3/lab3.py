@@ -1,111 +1,112 @@
-import time
-import random
+class Sort:
+    def __init__(self):
+        self._steps = []
 
-class Sorting:
-    @staticmethod
-    def is_sorted(arr):
-        return all(arr[i] <= arr[i + 1] for i in range(len(arr) - 1))
+    def sort(self, data):
+        pass
 
-    def sort(self, arr):
-        raise NotImplementedError("Subclasses must implement sort method.")
+    def _record_step(self, data):
+        self._steps.append(data)
 
 
-class SelectionSort(Sorting):
-    @staticmethod
-    def sort(arr):
-        steps = []
-        for i in range(len(arr)):
+class RadixSort(Sort):
+    def sort(self, data):
+        if all(isinstance(item, int) for item in data):
+            return self._sort_numbers(data)
+        elif all(isinstance(item, str) for item in data):
+            return self._sort_strings(data)
+        else:
+            raise ValueError("Unsupported data type in the input array.")
+
+    def _sort_numbers(self, data):
+        max_num = max(data)
+        max_length = len(str(max_num))
+
+        for i in range(max_length):
+            buckets = [[] for _ in range(10)]
+            for num in data:
+                digit = (num // (10 ** i)) % 10
+                buckets[digit].append(num)
+            data = [num for bucket in buckets for num in bucket]
+            self._record_step(data)
+        return data
+
+    def _sort_strings(self, data):
+        max_length = max(len(item) for item in data)
+        for i in range(max_length - 1, -1, -1):
+            buckets = [[] for _ in range(256)]
+            for item in data:
+                key = ord(item[i]) if i < len(item) else 0
+                buckets[key].append(item)
+            data = [item for bucket in buckets for item in bucket]
+            self._record_step(data)
+        return data
+
+
+class SelectionSort(Sort):
+    def sort(self, data):
+        for i in range(len(data)):
             min_index = i
-            for j in range(i + 1, len(arr)):
-                if arr[j] < arr[min_index]:
+            for j in range(i + 1, len(data)):
+                if data[j] < data[min_index]:
                     min_index = j
-            arr[i], arr[min_index] = arr[min_index], arr[i]
-            steps.append(arr.copy())
-        return arr, steps
+            data[i], data[min_index] = data[min_index], data[i]
+            self._record_step(data)
+        return data
 
 
-class RadixSort(Sorting):
-    @staticmethod
-    def counting_sort(arr, exp):
-        n = len(arr)
-        output = [0] * n
-        count = [0] * 10
+class SortWithSteps:
+    def __init__(self, sort_algorithm):
+        self.sort_algorithm = sort_algorithm
+        self._visualizer = SortVisualizer(self)
 
-        for i in range(n):
-            index = (arr[i] // exp) % 10
-            count[index] += 1
+    def sort(self, data):
+        return self.sort_algorithm.sort(data)
 
-        for i in range(1, 10):
-            count[i] += count[i - 1]
+    def get_steps(self):
+        return self.sort_algorithm._steps
 
-        i = n - 1
-        while i >= 0:
-            index = (arr[i] // exp) % 10
-            output[count[index] - 1] = arr[i]
-            count[index] -= 1
-            i -= 1
-
-        for i in range(n):
-            arr[i] = output[i]
-
-    @staticmethod
-    def sort(arr):
-        steps = []
-        max_num = max(arr)
-        exp = 1
-        while max_num // exp > 0:
-            RadixSort.counting_sort(arr, exp)
-            steps.append(arr.copy())
-            exp *= 10
-        return arr, steps
-
-# class RadixSort:
-#     def __init__(self) -> None:
-#         self._steps = []
-        
-#     def sort(self, data):
-        
+    def visualize_sorting(self):
+        self._visualizer.visualize_sorting()
 
 
-def perform_sort(array, sort_func, sort_name):
-    start_time = time.perf_counter()
-    sorted_array, steps = sort_func(array)
-    end_time = time.perf_counter()
-    elapsed_time = end_time - start_time
+class SortVisualizer:
+    def __init__(self, sort_with_steps):
+        self.sort_with_steps = sort_with_steps
 
-    print("------------------------------------\n")
-    for step in steps:
-        print(step)
-    print("------------------------------------\n"
-          f"Массив после {sort_name}: {sorted_array}\n"
-          f"Длина массива {sort_name}: {len(sorted_array)}\n"
-          f"Время выполнения {sort_name}: {elapsed_time}\n"
-          f"Является массив отсортированным: {Sorting.is_sorted(sorted_array)}\n")
+    def visualize_sorting(self):
+        steps = self.sort_with_steps.get_steps()
+        for i, step in enumerate(steps, start=1):
+            print(f"Step {i}: \n{','.join(map(str, step))}")
+            print("-" * 20)  # добавляем разделитель между шагами
 
 
 def menu():
     print("1 - Сортировка выбором\n"
-          "2 - Поразрядная сортировка\n"
+          "2 - Радикс сортировка\n"
           "0 - Выход")
     return int(input("Введите >> "))
 
 
-def main():
-    array = [random.randint(1, 100) for _ in range(10)]
+# data = [5, 6, 10, 1, 15, 4]
+data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony"]
 
-    print(f"Массив до сортировки: {array} \n"
-          f"Длина массива: {len(array)}")
+print(f"Массив до сортировки: {data}")
 
-    while True:
-        choice = menu()
+# Создаем объекты SortWithSteps и SortVisualizer заранее
+selection_sort = SortWithSteps(SelectionSort())
+radix_sort = SortWithSteps(RadixSort())
 
-        if choice == 0:
-            exit()
-        elif choice == 1:
-            perform_sort(array.copy(), SelectionSort.sort, "сортировки выбором")
-        elif choice == 2:
-            perform_sort(array.copy(), RadixSort.sort, "поразрядной сортировки")
+while True:
+    choice = menu()
 
-
-if __name__ == "__main__":
-    main()
+    if choice == 0:
+        exit()
+    elif choice == 1:
+        sorted_data = selection_sort.sort(data.copy())
+        selection_sort.visualize_sorting()
+        print(f"Selection sort: \n{sorted_data}")
+    elif choice == 2:
+        sorted_data = radix_sort.sort(data.copy())
+        radix_sort.visualize_sorting()
+        print(f"Radix sort: \n{sorted_data}")
