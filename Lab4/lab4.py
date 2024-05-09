@@ -36,7 +36,7 @@ class URLFinder:
             urls_found = self.parse_urls(html_content)
             self.urls.update(urls_found)
             for url_found in urls_found:
-                print(url_found)  # выводим найденный URL в консоль
+                print(url_found)
                 self.dfs(url_found, current_depth - 1)
 
     def find_urls_fsm(self):
@@ -48,7 +48,7 @@ class URLFinder:
             urls_found = self.parse_urls(html_content)
             self.urls.update(urls_found)
             for url_found in urls_found:
-                print(url_found)  # выводим найденный URL в консоль
+                print(url_found)
 
     def save_urls_to_file(self, filename):
         with open(filename, 'w', encoding='utf-8') as f:
