@@ -1,127 +1,127 @@
-import heapq
-import hashlib
+from collections import Counter
+from heapq import heapify, heappop, heappush
+from bitarray import bitarray
 
-class Node:
-    def __init__(self, symbol, freq):
-        self.symbol = symbol
-        self.freq = freq
-        self.left = None
-        self.right = None
+def compress(filename):
+    """
+    Compresses a PPM image using Vitter's algorithm.
 
-    def __lt__(self, other):
-        return self.freq < other.freq
+    Args:
+        filename: The path to the PPM image file.
+    """
 
-def build_huffman_tree(freq_dict):
-    priority_queue = [Node(symbol, freq) for symbol, freq in freq_dict.items()]
-    heapq.heapify(priority_queue)
+    with open(filename, 'rb') as f:
+        # Read and ignore comment lines
+        while True:
+            line = f.readline().decode('utf-8').strip()  # Assuming UTF-8 encoding, adjust if needed
+            if not line.startswith('#'):
+                header = line.strip().split()
+                break
 
-    while len(priority_queue) > 1:
-        left = heapq.heappop(priority_queue)
-        right = heapq.heappop(priority_queue)
-        merged = Node(None, left.freq + right.freq)
-        merged.left = left
-        merged.right = right
-        heapq.heappush(priority_queue, merged)
+        # Read width, height, and max value
+        width, height = int(header[1]), int(header[2])
+        max_val = int(f.readline().decode('utf-8').strip())
 
-    return priority_queue[0]
+        # Read pixel data
+        data = f.read()
 
-def build_codewords_table(node, code="", codewords_table={}):
-    if node is not None:
-        if node.symbol is not None:
-            codewords_table[node.symbol] = code
-        codewords_table = build_codewords_table(node.left, code + "0", codewords_table)
-        codewords_table = build_codewords_table(node.right, code + "1", codewords_table)
-    return codewords_table
+    # Build symbol frequencies
+    frequencies = Counter(data)
 
-def encode_symbol(symbol, codewords_table):
-    return codewords_table[symbol]
+    # Create Huffman tree
+    heap = [[weight, [symbol, ""]] for symbol, weight in frequencies.items()]
+    heapify(heap)
+    while len(heap) > 1:
+        lo = heappop(heap)
+        hi = heappop(heap)
+        for pair in lo[1:]:
+            pair[1] = '0' + pair[1]
+        for pair in hi[1:]:
+            pair[1] = '1' + pair[1]
+        heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
 
-def encode_text(text, codewords_table):
-    encoded_text = ""
-    for symbol in text:
-        encoded_text += encode_symbol(symbol, codewords_table)
-    return encoded_text
+    # Create codebook
+    codebook = {symbol: code for weight, [symbol, code] in heap[0][1:]}
 
-def compress(input_file, output_file):
-    with open(input_file, 'rb') as f:
-        content = f.read()
+    # Encode data
+    encoded_data = bitarray()
+    for byte in data:
+        encoded_data.extend(codebook[byte])
 
-    freq_dict = {}
-    for byte in content:
-        freq_dict[byte] = freq_dict.get(byte, 0) + 1
-
-    huffman_tree = build_huffman_tree(freq_dict)  # Сохраняем дерево Хаффмана
-    codewords_table = build_codewords_table(huffman_tree)
-
-    encoded_text = encode_text(content, codewords_table)
-
-    # Write the encoded text to the output file
-    with open(output_file, 'wb') as f:
-        f.write(encoded_text.encode())
-
-    return codewords_table, huffman_tree  # Возвращаем таблицу кодов и дерево Хаффмана
-
-def decode_text(encoded_text, huffman_tree):
-    decoded_text = ""
-    current_node = huffman_tree
-    for bit in encoded_text:
-        if bit == '0':
-            current_node = current_node.left
-        else:
-            current_node = current_node.right
-        if current_node.symbol is not None:
-            decoded_text += chr(current_node.symbol)
-            current_node = huffman_tree
-    return decoded_text
-
-def decompress(input_file, output_file, codewords_table, huffman_tree):
-    # Read the encoded text from the input file
-    with open(input_file, 'rb') as f:
-        encoded_text = f.read()
-
-    # Decode the encoded text using the codewords table
-    decoded_text = decode_text(encoded_text.decode(), huffman_tree)
-
-    # Write the decoded text to the output file
-    with open(output_file, 'wb') as f:
-        f.write(decoded_text.encode())
+    # Write compressed data to file
+    with open(f"{filename}.compressed", 'wb') as f:
+        f.write(f"P6\n{width} {height}\n{max_val}\n".encode('utf-8'))
+        f.write(encoded_data.tobytes())
 
 
+def decompress(filename):
+    """
+    Decompresses a PPM image compressed using Vitter's algorithm.
 
-def hash_file(file_path):
-    """Generate a hash for a file."""
-    hasher = hashlib.sha256()
-    with open(file_path, 'rb') as f:
-        while chunk := f.read(4096):
-            hasher.update(chunk)
-    return hasher.hexdigest()
+    Args:
+        filename: The path to the compressed PPM image file.
+    """
 
-def compare_files(file1, file2):
-    """Compare two files by their hashes."""
-    hash1 = hash_file(file1)
-    hash2 = hash_file(file2)
-    if hash1 == hash2:
-        print("Файлы", file1, "и", file2, "идентичны.")
-    else:
-        print("Файлы", file1, "и", file2, "не идентичны.")
+    with open(filename, 'rb') as f:
+        # Read PPM header
+        header = f.readline().decode('utf-8').strip().split()
+        width, height = int(header[1]), int(header[2])
+        max_val = int(header[3])
 
-def main():
-    input_file = "input.ppm"
-    output_file = "compressed.ppm"
+        # Read encoded data
+        encoded_data = bitarray()
+        encoded_data.fromfile(f)
 
-    # Compression
-    codewords_table, huffman_tree = compress(input_file, output_file)  # Получаем таблицу кодов и дерево Хаффмана
-    print("Compression successful.")
+    # Build Huffman tree
+    heap = [[weight, [symbol, ""]] for symbol, weight in Counter(encoded_data.tobytes()).items()]
+    heapify(heap)
+    while len(heap) > 1:
+        lo = heappop(heap)
+        hi = heappop(heap)
+        for pair in lo[1:]:
+            pair[1] = '0' + pair[1]
+        for pair in hi[1:]:
+            pair[1] = '1' + pair[1]
+        heappush(heap, [lo[0] + hi[0]] + lo[1:] + hi[1:])
 
-    # Decompression
-    input_file_compressed = "compressed.ppm"
-    output_file_decompressed = "decompressed.ppm"
+    # Decode data
+    decoded_data = bytearray()
+    current_code = ""
+    for bit in encoded_data:
+        current_code += str(bit)
+        for weight, [symbol, code] in heap[0][1:]:
+            if code == current_code:
+                decoded_data.append(symbol)
+                current_code = ""
+                break
 
-    decompress(input_file_compressed, output_file_decompressed, codewords_table, huffman_tree)  # Передаем дерево Хаффмана
-    print("Decompression successful.")
+    # Write decompressed data to file
+    with open(f"{filename}.decompressed", 'wb') as f:
+        f.write(f"P6\n{width} {height}\n{max_val}\n".encode('utf-8'))
+        f.write(decoded_data)
 
-    # Compare files
-    compare_files(input_file, output_file)
 
-if __name__ == "__main__":
-    main()
+def compare_files(original_file, decompressed_file):
+    """
+    Compares the original and decompressed files to check if they are identical.
+
+    Args:
+        original_file: The path to the original PPM image file.
+        decompressed_file: The path to the decompressed PPM image file.
+
+    Returns:
+        True if the files are identical, False otherwise.
+    """
+    with open(original_file, 'rb') as f1, open(decompressed_file, 'rb') as f2:
+        return f1.read() == f2.read()
+
+
+# Example usage
+filename = "input.ppm"  # Replace with your PPM file name
+compress(filename)
+decompress(f"{filename}.compressed")
+
+if compare_files(filename, f"{filename}.decompressed"):
+    print("Files are identical!")
+else:
+    print("Files are different!")
