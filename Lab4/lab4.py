@@ -66,6 +66,7 @@ def test_algorithm(url, depth):
     finder.find_urls_naive()
     naive_time = time.time() - start_time
 
+    print("-" * 20)
     print(f"URLs found using Finite State Machine algorithm: {len(finder.urls)}")
     print(f"URLs found using Naive algorithm: {len(finder.urls)}")
 
