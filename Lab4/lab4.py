@@ -28,8 +28,7 @@ class URLFinder:
 
     def dfs(self, current_url, current_depth):
         if current_url in self.visited or current_depth == 0:
-            return
-        self.visited.add(current_url)
+            return self.visited.add(current_url)
 
         html_content = self.fetch_url(current_url)
         if html_content:
