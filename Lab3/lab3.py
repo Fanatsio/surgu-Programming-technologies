@@ -8,7 +8,6 @@ class Sort:
     def _record_step(self, data):
         self._steps.append(data)
 
-
 class RadixSort(Sort):
     def sort(self, data):
         if all(isinstance(item, int) for item in data):
@@ -42,7 +41,6 @@ class RadixSort(Sort):
             self._record_step(data)
         return data
 
-
 class SelectionSort(Sort):
     def sort(self, data):
         for i in range(len(data)):
@@ -53,7 +51,6 @@ class SelectionSort(Sort):
             data[i], data[min_index] = data[min_index], data[i]
             self._record_step(data)
         return data
-
 
 class SortWithSteps:
     def __init__(self, sort_algorithm):
@@ -69,7 +66,6 @@ class SortWithSteps:
     def visualize_sorting(self):
         self._visualizer.visualize_sorting()
 
-
 class SortVisualizer:
     def __init__(self, sort_with_steps):
         self.sort_with_steps = sort_with_steps
@@ -80,13 +76,11 @@ class SortVisualizer:
             print(f"Step {i}: \n{','.join(map(str, step))}")
             print("-" * 20)  # добавляем разделитель между шагами
 
-
 def menu():
     print("1 - Сортировка выбором\n"
           "2 - Радикс сортировка\n"
           "0 - Выход")
     return int(input("Введите >> "))
-
 
 # data = [5, 6, 10, 1, 15, 4]
 data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony"]
