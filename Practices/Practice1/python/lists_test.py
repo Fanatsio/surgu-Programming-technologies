@@ -622,3 +622,6 @@ def test_list_count_same():
     for _ in range(randint(0, 1000)):
         lst.append(42)
     assert lst.count(42) == len(lst)
+
+if __name__ == "__main__":
+    pytest.main()
