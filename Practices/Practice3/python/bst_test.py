@@ -351,3 +351,5 @@ def test_tree_count_same():
     for _ in range(randint(0, 900)):
         t.insert_node(42)
     assert t.count(42) == len(t)
+if __name__ == "__main__":
+    pytest.main()

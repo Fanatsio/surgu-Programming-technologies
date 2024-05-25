@@ -244,3 +244,6 @@ def test_5_node_eq(values):
         right=TreeNode(values[2], right=TreeNode(values[4])),
     )
     assert n1 == n2
+
+if __name__ == "__main__":
+    pytest.main()

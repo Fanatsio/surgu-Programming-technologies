@@ -158,3 +158,5 @@ if __name__ == "__main__":
     t.visualize()
 
 
+if __name__ == "__main__":
+    pytest.main()
