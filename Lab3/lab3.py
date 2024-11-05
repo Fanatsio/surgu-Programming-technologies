@@ -74,7 +74,7 @@ class SortVisualizer:
         steps = self.sort_with_steps.get_steps()
         for i, step in enumerate(steps, start=1):
             print(f"Step {i}: \n{','.join(map(str, step))}")
-            print("-" * 20)  # добавляем разделитель между шагами
+            print("-" * 20)
 
 def menu():
     print("1 - Сортировка выбором\n"
@@ -87,7 +87,6 @@ data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "a
 
 print(f"Массив до сортировки: {data}")
 
-# Создаем объекты SortWithSteps и SortVisualizer заранее
 selection_sort = SortWithSteps(SelectionSort())
 radix_sort = SortWithSteps(RadixSort())
 

@@ -1,6 +1,5 @@
 import turtle
 
-
 def recursive_dragon_curve(turtle, gens, length):
     if gens == 0:
         turtle.forward(length)
@@ -9,7 +8,6 @@ def recursive_dragon_curve(turtle, gens, length):
         turtle.right(90)
         reverse_dragon_curve(turtle, gens - 1, length)
 
-
 def reverse_dragon_curve(turtle, gens, length):
     if gens == 0:
         turtle.forward(length)
@@ -17,7 +15,6 @@ def reverse_dragon_curve(turtle, gens, length):
         recursive_dragon_curve(turtle, gens - 1, length)
         turtle.left(90)
         reverse_dragon_curve(turtle, gens - 1, length)
-
 
 WIDTH, HEIGHT = 1000, 800
 screen = turtle.Screen()

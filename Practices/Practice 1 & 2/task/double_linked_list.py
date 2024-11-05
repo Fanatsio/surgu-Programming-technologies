@@ -150,4 +150,3 @@ class DoublyLinkedList:
 
     def __str__(self):
         return " <-> ".join([str(i) for i in self])
-

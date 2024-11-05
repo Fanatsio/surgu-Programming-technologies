@@ -80,11 +80,11 @@ class URLStateMachine(URLFinder):
         print("FSM done.")
 
 def test_algorithm(url, depth):
-    naive_finder = NaiveURLFinder(url, depth)
+    # naive_finder = NaiveURLFinder(url, depth)
 
-    start_time = time.time()
-    naive_finder.find_urls()
-    naive_time = time.time() - start_time
+    # start_time = time.time()
+    # naive_finder.find_urls()
+    # naive_time = time.time() - start_time
 
     fsm_finder = URLStateMachine(url, depth)
 
@@ -95,12 +95,12 @@ def test_algorithm(url, depth):
     print("-" * 20)
     print(f"URLs found: {len(fsm_finder.urls)}")
 
-    print(f"Time taken by Naive algorithm: {naive_time:.2f} seconds")
+    # print(f"Time taken by Naive algorithm: {naive_time:.2f} seconds")
     print(f"Time taken by Finite State Machine algorithm: {fsm_time:.2f} seconds")
 
-    filename_naive = "found_urls_naive.txt"
-    naive_finder.save_urls_to_file(filename_naive)
-    print(f"Found URLs (Naive) saved to {filename_naive}")
+    # filename_naive = "found_urls_naive.txt"
+    # naive_finder.save_urls_to_file(filename_naive)
+    # print(f"Found URLs (Naive) saved to {filename_naive}")
 
     filename_fsm = "found_urls_fsm.txt"
     fsm_finder.save_urls_to_file(filename_fsm)

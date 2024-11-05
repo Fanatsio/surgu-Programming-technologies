@@ -4,7 +4,7 @@ from double_linked_list import DoublyLinkedList, StudentNode
 
 if __name__ == "__main__":
     students = DoublyLinkedList()
-    students.append(StudentNode("Батуро", 2000, 2021, [1, 1, 3, 4, 5]))
+    students.append(StudentNode("Речук", 2000, 2021, [1, 1, 3, 4, 5]))
     students.append(StudentNode("Иванов", 2001, 2020, [5, 2, 3, 4, 5]))
     students.append(StudentNode("Петров", 2002, 2021, [1, 3, 3, 2, 5]))
     students.append(StudentNode("Александров", 2002, 2020, [1, 3, 3, 2, 5]))
