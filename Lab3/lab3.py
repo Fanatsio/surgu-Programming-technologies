@@ -3,19 +3,25 @@ class Sort:
         self._steps = []
 
     def sort(self, data):
-        pass
+        raise NotImplementedError
 
     def _record_step(self, data):
-        self._steps.append(data)
+        self._steps.append(data.copy())
+
+    def get_steps(self):
+        return self._steps
 
 class RadixSort(Sort):
     def sort(self, data):
+        if not data:
+            return data
+
         if all(isinstance(item, int) for item in data):
             return self._sort_numbers(data)
         elif all(isinstance(item, str) for item in data):
             return self._sort_strings(data)
         else:
-            raise ValueError("Unsupported data type in the input array.")
+            raise ValueError("Input array must contain only integers or only strings.")
 
     def _sort_numbers(self, data):
         max_num = max(data)
@@ -32,6 +38,7 @@ class RadixSort(Sort):
 
     def _sort_strings(self, data):
         max_length = max(len(item) for item in data)
+
         for i in range(max_length - 1, -1, -1):
             buckets = [[] for _ in range(256)]
             for item in data:
@@ -43,7 +50,7 @@ class RadixSort(Sort):
 
 class SelectionSort(Sort):
     def sort(self, data):
-        for i in range(len(data)):
+        for i in range(len(data) - 1):
             min_index = i
             for j in range(i + 1, len(data)):
                 if data[j] < data[min_index]:
@@ -55,25 +62,14 @@ class SelectionSort(Sort):
 class SortWithSteps:
     def __init__(self, sort_algorithm):
         self.sort_algorithm = sort_algorithm
-        self._visualizer = SortVisualizer(self)
 
     def sort(self, data):
         return self.sort_algorithm.sort(data)
 
-    def get_steps(self):
-        return self.sort_algorithm._steps
-
     def visualize_sorting(self):
-        self._visualizer.visualize_sorting()
-
-class SortVisualizer:
-    def __init__(self, sort_with_steps):
-        self.sort_with_steps = sort_with_steps
-
-    def visualize_sorting(self):
-        steps = self.sort_with_steps.get_steps()
+        steps = self.sort_algorithm.get_steps()
         for i, step in enumerate(steps, start=1):
-            print(f"Step {i}: \n{','.join(map(str, step))}")
+            print(f"Step {i}: {', '.join(map(str, step))}")
             print("-" * 20)
 
 def menu():
@@ -82,8 +78,8 @@ def menu():
           "0 - Выход")
     return int(input("Введите >> "))
 
-# data = [5, 6, 10, 1, 15, 4]
-data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony"]
+data = [5, 6, 10, 1, 15, 4]
+#data = ["michelle", "tigger", "sunshine", "chocolate", "password1", "soccer", "anthony"]
 
 print(f"Массив до сортировки: {data}")
 
@@ -92,14 +88,16 @@ radix_sort = SortWithSteps(RadixSort())
 
 while True:
     choice = menu()
-
     if choice == 0:
-        exit()
+        print("Выход из программы.")
+        break
     elif choice == 1:
         sorted_data = selection_sort.sort(data.copy())
         selection_sort.visualize_sorting()
-        print(f"Selection sort: \n{sorted_data}")
+        print(f"Selection sort result: {sorted_data}")
     elif choice == 2:
         sorted_data = radix_sort.sort(data.copy())
         radix_sort.visualize_sorting()
-        print(f"Radix sort: \n{sorted_data}")
+        print(f"Radix sort result: {sorted_data}")
+    else:
+        print("Неверный выбор. Попробуйте снова.")
