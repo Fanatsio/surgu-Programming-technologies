@@ -65,7 +65,7 @@ class NaiveURLFinder(BaseURLFinder):
                 for url_found in urls_found:
                     norm_url = self.normalize_url(url_found)
                     if norm_url not in self.urls:
-                        print(f"Naive: Found URL - {norm_url}")
+                        print(f"Naive: {norm_url}")
                         self.urls.add(norm_url)
                         queue.append((norm_url, current_depth - 1))
 
@@ -107,7 +107,7 @@ class URLStateMachine(BaseURLFinder):
                 for url_found in urls_found:
                     norm_url = self.normalize_url(url_found)
                     if norm_url not in self.urls:
-                        print(f"FSM: Found URL - {norm_url}")
+                        print(f"FSM: {norm_url}")
                         self.urls.add(norm_url)
                         queue.append((norm_url, current_depth - 1))
 
