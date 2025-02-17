@@ -3,19 +3,20 @@ from bs4 import BeautifulSoup
 from urllib.parse import urljoin, urlparse
 from collections import deque
 import time
+from typing import Set, Deque, Tuple, Optional, Dict
 
 class BaseURLFinder:
-    def __init__(self, url, depth, max_urls=5000):
+    def __init__(self, url: str, depth: int, max_urls: int = 5000):
         self.url = url
         self.depth = depth
-        self.urls = set()
-        self.visited = set()
+        self.urls: Set[str] = set()
+        self.visited: Set[str] = set()
         self.session = requests.Session()
         self.session.headers.update({'User-Agent': 'Mozilla/5.0'})
         self.max_urls = max_urls
-        self.domain_limits = {}
+        self.domain_limits: Dict[str, int] = {}
 
-    def fetch_url(self, url):
+    def fetch_url(self, url: str) -> Optional[str]:
         domain = urlparse(url).netloc
 
         if self.domain_limits.get(domain, 0) > 100:
@@ -32,26 +33,26 @@ class BaseURLFinder:
             print(f"Error fetching {url}: {e}")
         return None
 
-    def parse_urls(self, html_content, base_url):
+    def parse_urls(self, html_content: str, base_url: str) -> Set[str]:
         if not html_content:
-            return []
+            return set()
 
         soup = BeautifulSoup(html_content, 'html.parser')
-        urls_found = [urljoin(base_url, link.get('href')) for link in soup.find_all('a', href=True)]
-        return [url for url in set(urls_found) if url.startswith('http')]
+        urls_found = {urljoin(base_url, link.get('href')) for link in soup.find_all('a', href=True)}
+        return {url for url in urls_found if url.startswith('http')}
 
-    def normalize_url(self, url):
+    def normalize_url(self, url: str) -> str:
         parsed = urlparse(url)
         return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
 
-    def save_urls_to_file(self, filename):
+    def save_urls_to_file(self, filename: str):
         with open(filename, 'w', encoding='utf-8') as f:
             for url in self.urls:
                 f.write(url + '\n')
 
 class NaiveURLFinder(BaseURLFinder):
     def run(self):
-        queue = deque([(self.url, self.depth)])
+        queue: Deque[Tuple[str, int]] = deque([(self.url, self.depth)])
         while queue:
             current_url, current_depth = queue.popleft()
             if current_url in self.visited or current_depth == 0 or len(self.urls) >= self.max_urls:
@@ -75,21 +76,20 @@ class URLStateMachine(BaseURLFinder):
         PARSING = 'PARSING'
         END = 'END'
 
-    def __init__(self, url, depth, max_urls=5000):
+    def __init__(self, url: str, depth: int, max_urls: int = 5000):
         super().__init__(url, depth, max_urls)
         self.state = self.State.INITIAL
 
-    def transition(self, new_state):
+    def transition(self, new_state: str):
         print(f"Transitioning to {new_state}")
         self.state = new_state
 
     def run(self):
-        queue = deque([(self.url, self.depth)])
+        queue: Deque[Tuple[str, int]] = deque([(self.url, self.depth)])
         while queue:
             current_url, current_depth = queue.popleft()
 
             if self.state == self.State.INITIAL:
-                # Начинаем с того, что проверяем URL
                 if current_url in self.visited or current_depth == 0 or len(self.urls) >= self.max_urls:
                     continue
 
@@ -100,7 +100,7 @@ class URLStateMachine(BaseURLFinder):
                 html_content = self.fetch_url(current_url)
                 if html_content:
                     self.transition(self.State.PARSING)
-                    queue.append((current_url, current_depth - 1))  # Переход к следующему URL
+                    queue.append((current_url, current_depth - 1))
 
             if self.state == self.State.PARSING:
                 urls_found = self.parse_urls(html_content, current_url)
@@ -113,20 +113,24 @@ class URLStateMachine(BaseURLFinder):
 
                 self.transition(self.State.INITIAL)
 
-url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
-depth = 2
+def main():
+    url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
+    depth = 2
 
-naive_finder = NaiveURLFinder(url, depth, max_urls=5000)
-fsm_finder = URLStateMachine(url, depth, max_urls=5000)
+    naive_finder = NaiveURLFinder(url, depth, max_urls=5000)
+    fsm_finder = URLStateMachine(url, depth, max_urls=5000)
 
-start_time = time.time()
-naive_finder.run()
-naive_time = time.time() - start_time
+    start_time = time.time()
+    naive_finder.run()
+    naive_time = time.time() - start_time
 
-start_time = time.time()
-fsm_finder.run()
-fsm_time = time.time() - start_time
+    start_time = time.time()
+    fsm_finder.run()
+    fsm_time = time.time() - start_time
 
-print("-" * 20)
-print(f"Naive algorithm found: {len(naive_finder.urls)} URLs in {naive_time:.2f} sec")
-print(f"FSM found: {len(fsm_finder.urls)} URLs in {fsm_time:.2f} sec")
+    print("-" * 20)
+    print(f"Naive algorithm found: {len(naive_finder.urls)} URLs in {naive_time:.2f} sec")
+    print(f"FSM found: {len(fsm_finder.urls)} URLs in {fsm_time:.2f} sec")
+
+if __name__ == "__main__":
+    main()
