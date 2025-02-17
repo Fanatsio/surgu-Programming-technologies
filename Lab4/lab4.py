@@ -113,24 +113,20 @@ class URLStateMachine(BaseURLFinder):
 
                 self.transition(self.State.INITIAL)
 
-def main():
-    url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
-    depth = 2
+url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
+depth = 2
 
-    naive_finder = NaiveURLFinder(url, depth, max_urls=5000)
-    fsm_finder = URLStateMachine(url, depth, max_urls=5000)
+naive_finder = NaiveURLFinder(url, depth, max_urls=5000)
+fsm_finder = URLStateMachine(url, depth, max_urls=5000)
 
-    start_time = time.time()
-    naive_finder.run()
-    naive_time = time.time() - start_time
+start_time = time.time()
+naive_finder.run()
+naive_time = time.time() - start_time
 
-    start_time = time.time()
-    fsm_finder.run()
-    fsm_time = time.time() - start_time
+start_time = time.time()
+fsm_finder.run()
+fsm_time = time.time() - start_time
 
-    print("-" * 20)
-    print(f"Naive algorithm found: {len(naive_finder.urls)} URLs in {naive_time:.2f} sec")
-    print(f"FSM found: {len(fsm_finder.urls)} URLs in {fsm_time:.2f} sec")
-
-if __name__ == "__main__":
-    main()
+print("-" * 20)
+print(f"Naive algorithm found: {len(naive_finder.urls)} URLs in {naive_time:.2f} sec")
+print(f"FSM found: {len(fsm_finder.urls)} URLs in {fsm_time:.2f} sec")
