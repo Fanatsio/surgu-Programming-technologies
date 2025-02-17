@@ -97,14 +97,12 @@ class URLStateMachine(BaseURLFinder):
                 self.transition(self.State.FETCHING)
 
             if self.state == self.State.FETCHING:
-                # Пытаемся загрузить страницу
                 html_content = self.fetch_url(current_url)
                 if html_content:
                     self.transition(self.State.PARSING)
                     queue.append((current_url, current_depth - 1))  # Переход к следующему URL
 
             if self.state == self.State.PARSING:
-                # Парсим найденные URL
                 urls_found = self.parse_urls(html_content, current_url)
                 for url_found in urls_found:
                     norm_url = self.normalize_url(url_found)
@@ -113,7 +111,6 @@ class URLStateMachine(BaseURLFinder):
                         self.urls.add(norm_url)
                         queue.append((norm_url, current_depth - 1))
 
-                # Возвращаемся в начальное состояние для следующего URL
                 self.transition(self.State.INITIAL)
 
 url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
