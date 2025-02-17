@@ -41,7 +41,6 @@ class BaseURLFinder:
         return [url for url in set(urls_found) if url.startswith('http')]
 
     def normalize_url(self, url):
-        """Приводит URL к каноническому виду."""
         parsed = urlparse(url)
         return f"{parsed.scheme}://{parsed.netloc}{parsed.path}"
 
@@ -68,7 +67,6 @@ class NaiveURLFinder(BaseURLFinder):
                         print(f"Naive: Found URL - {norm_url}")
                         self.urls.add(norm_url)
                         queue.append((norm_url, current_depth - 1))
-
 
 class URLStateMachine(BaseURLFinder):
     class State:
@@ -117,7 +115,6 @@ class URLStateMachine(BaseURLFinder):
 
                 # Возвращаемся в начальное состояние для следующего URL
                 self.transition(self.State.INITIAL)
-
 
 url = "https://en.wikipedia.org/wiki/List_of_Hindi_songs_recorded_by_Asha_Bhosle"
 depth = 2
